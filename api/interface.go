@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/go-macaroon-bakery/macaroon-bakery/v3/httpbakery"
@@ -113,6 +114,12 @@ func (info *Info) Validate() error {
 	}
 
 	for _, addr := range info.Addrs {
+		// We ignore the path segment as for dialing we may want to dial
+		// something like: controller.com:17070/segment/api
+		parsedAddr, _, ok := strings.Cut(addr, "/")
+		if ok {
+			addr = parsedAddr
+		}
 		_, err := network.ParseMachineHostPort(addr)
 		if err != nil {
 			return errors.NotValidf("host addresses: %v", err)

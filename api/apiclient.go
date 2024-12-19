@@ -15,6 +15,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	gopath "path"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -684,14 +685,10 @@ func (ap *addressProvider) next(ctx context.Context) (*resolvedAddress, error) {
 			// Lookup only the host section excluding segments
 			// But store the Path to append to resolved addresses.
 			path := ""
-			if strings.Contains(host, "/") {
-				host = "https://" + host // Just so we can parse it into a URL
-				parsedURL, err := url.Parse(host)
-				if err != nil {
-					return nil, errors.Errorf("invalid address %q: %v", host, err)
-				}
-				host = parsedURL.Hostname()
-				path = parsedURL.Path
+			if strings.Contains(port, "/") {
+				s := strings.Split(port, "/")
+				port = s[0]
+				path = s[1]
 			}
 
 			ips := ap.dnsCache.Lookup(host)
@@ -918,7 +915,7 @@ func dialWebsocketMulti(ctx context.Context, addrs []string, path string, opts d
 		// Check if it is an existing path and prepend it to the resolved
 		// path.
 		if resolvedAddr.existingPath != "" {
-			path = resolvedAddr.existingPath + path
+			path = gopath.Join("/", resolvedAddr.existingPath, path)
 		}
 
 		err = startDialWebsocket(ctx, try, ipStr, resolvedAddr.host, path, opts)

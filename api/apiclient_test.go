@@ -248,7 +248,9 @@ func (s *apiclientSuite) TestVerifyCA(c *gc.C) {
 		}()
 
 		atomic.StoreInt32(&connCount, 0)
-		info.Addrs = []string{listener.Addr().String()}
+		info.Addrs = []string{
+			listener.Addr().String(),
+		}
 		_, _, err = api.DialAPI(info, api.DialOpts{
 			VerifyCA: spec.verifyCA,
 		})
@@ -776,7 +778,7 @@ func (s *apiclientSuite) TestOpenCachesDNSAndRemovesSegments(c *gc.C) {
 	conn, err := api.Open(
 		&api.Info{
 			Addrs: []string{
-				"place1.example/segment:1234",
+				"place1.example:1234/segment",
 			},
 			SkipLogin: true,
 			CACert:    jtesting.CACert,
