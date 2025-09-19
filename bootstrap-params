@@ -1,0 +1,153 @@
+controller-config:
+  agent-logfile-max-backups: 2
+  agent-logfile-max-size: 100M
+  api-port: 17070
+  api-port-open-delay: 2s
+  audit-log-capture-args: false
+  audit-log-exclude-methods:
+  - ReadOnlyMethods
+  audit-log-max-backups: 10
+  audit-log-max-size: 300M
+  auditing-enabled: true
+  ca-cert: |
+    -----BEGIN CERTIFICATE-----
+    MIIEEjCCAnqgAwIBAgIUSIXGYjvUY47SS3KYCH76EyDHBCswDQYJKoZIhvcNAQEL
+    BQAwITENMAsGA1UEChMESnVqdTEQMA4GA1UEAxMHanVqdS1jYTAeFw0yNTA5MTky
+    MzEyNDVaFw0zNTA5MTkyMzE3NDVaMCExDTALBgNVBAoTBEp1anUxEDAOBgNVBAMT
+    B2p1anUtY2EwggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQCtxFR6YVXk
+    aya1No8/laWDoa0v5bnOL9ic1WuK0ka++mTlt5suXnQmFJ1zEx9600ohoRRCVHdB
+    6Y2hn6dY0uSFsPskDjihj9aFfAfAsxBVL5ZObGjai915GpfflekHhRYQlq4pF/us
+    XDv1iN63BvSGZlNB4U6GVxoa9gIJW+l/E7EXun2OfH9DblEB6KujOgvu+3HrMmBh
+    BuT41p9/CWg+NQX5IknybsScQkpyfjyr/7FKZbHb4dNNqPbKkxCFH/5BUmWE0RuK
+    9WE9Xm1BhDWlI+C+Vya/jXKw4skxMo+SmkWUk9pKZfGXDltnug6x4wS/ertOtIYT
+    6D/oZLRr+3VtzGie5VcR3LlqTFRn2f54glHnPKbtq4wvEWx6HTCcGvBaeQ5JiLea
+    Yo/oT5QJ4MLRcWvlCh/bC6OeG+ybJ1LpgLmzSLNn9ED6jhQO7Y4nVvyI9XzZ0T3B
+    AQZ38dUl48HDLJ2ZoEHKd9ypdN3GazbgTK3ByBddnXK13mZAIff3lZECAwEAAaNC
+    MEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFKDn
+    upfFcASM62bLaYDojRM3BiVPMA0GCSqGSIb3DQEBCwUAA4IBgQB9mtCd/NLcrpUo
+    Y6DiSyFMGLd6a/ULsP05wSvzNpfGOOaoHrQQaFt3Lay/mQY0XfJ8II1Y1Vp3K3PM
+    CDrYlkMt0d+Ne5PUrDYhtWR57xlpQQqYQGeBRbfezxhiXIhs0uK/vVHj5vOfLhLl
+    X6UtXsqPlwVfyRjCI3kRQS4T7SwFF6v0OfBG9sWLFtgEt4aIGVGc1ts2sTgMgt2V
+    Ff7vvH5/LHs6RiFVFRBrMWI4JRUqtwz/fdQUgEqCyTLwbb7+nFmxY0L8e1ATjQP8
+    NOpkiNrXVUR5G5krqRg+uU6qWG/za+Q807VztiKI7eLDhjGX8xjy+GvhtF1xK90a
+    8e9PxUlwgdMHuIuCeNVufn9/N8uRITSB+plJg/a8NINhVzffVAlnYYtZjQXieaGW
+    Tgi/ykuJdBUI24SqLQX2rBXCx8T2KP/jwH9y8gr6Ss3cxAs68hdCzBR2yP+2dqFW
+    lBhShvcDrGX5jL4lHUCfsNgxBEkX8Tzvc3E2DcOP7yi8BD6Z128=
+    -----END CERTIFICATE-----
+  controller-name: "1"
+  controller-uuid: 64475a48-50d7-40b1-891d-f84d278a2d30
+  juju-db-snap-channel: 4.4/stable
+  jujud-controller-snap-source: legacy
+  max-agent-state-size: 524288
+  max-charm-state-size: 2097152
+  max-debug-log-duration: 24h0m0s
+  max-prune-txn-batch-size: 1000000
+  max-prune-txn-passes: 100
+  max-txn-log-size: 10M
+  metering-url: https://api.jujucharms.com/omnibus/v3
+  migration-agent-wait-time: 15m0s
+  model-logfile-max-backups: 2
+  model-logfile-max-size: 10M
+  model-logs-size: 20M
+  mongo-memory-profile: default
+  prune-txn-query-count: 1000
+  prune-txn-sleep-time: 10ms
+  query-tracing-enabled: false
+  query-tracing-threshold: 1s
+  set-numa-control-policy: false
+  ssh-max-concurrent-connections: 100
+  ssh-server-port: 17022
+  state-port: 37017
+controller-model-config:
+  agent-metadata-url: ""
+  agent-stream: released
+  agent-version: 3.6.10
+  apt-ftp-proxy: ""
+  apt-http-proxy: ""
+  apt-https-proxy: ""
+  apt-mirror: ""
+  apt-no-proxy: ""
+  authorized-keys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDT0tJ5ZGHyYnl9XXIEoavHeKdk811sgWg3LVhIAi6GZ2JseN+QgicQZA1dSU8b/8osjZKC7RlZce0e8Flzps/7CFwn/qUrcmKCY0t0BcueHv3DfQSVpVO7HEvN1QyKyH5ANVTJpv8cm/tuaFJ9eFvFYHIqB25VHLfsN40jHW+wj3WrDg/J5TfNJ15bUiP8OS72j+Du3pXzThE2QFy5lYmyBg9dq5qiExu68oBmpohbKDvfN+UXJbqvjt0MMBrwNKZjAc9hbP8jtI2I9RwnrHY9WwY7734ieiyS3iRjvKcc8INvxQKZRaCNFiem+9jvXOYIKBXsgTqf/bGya0W+Jk9drv0of4bo+LZXKI/Skudz5Nt72bd65f87K41Sq6onxFlFGl/c2nOE1yrKtWyLqAB0/LNUTbpRq66JIlxj99lqlNOIdPHdSKsx+sa9HfZzA1jdG8ktq2oXOKwTcjt6wvANtJQ8jpRezj3pCVqU7mpQrnHuwfsNNNBLzUhuP8Cm0WFDyiXd2VwbagB9AYR5i0NztRbKCiztqpGt5W7+yMRdnJiLXjFLA276bb6ukqjxqKCOJY1o2TLY4S0XJMG6NNFTKhPa/fE1CxyMGnNp+cHr+pFtP0smvCgoga4pl6UiwwiKogxlSVnLreiFwkKS5pTgzhOS91AE+wTIFG6pYRAC5Q== juju-client-key
+  automatically-retry-hooks: true
+  backup-dir: ""
+  charmhub-url: https://api.charmhub.io
+  cloudinit-userdata: ""
+  container-image-metadata-defaults-disabled: false
+  container-image-metadata-url: ""
+  container-image-stream: released
+  container-inherit-properties: ""
+  container-networking-method: ""
+  default-base: ""
+  default-space: ""
+  development: false
+  disable-network-management: false
+  disable-telemetry: false
+  egress-subnets: ""
+  enable-os-refresh-update: true
+  enable-os-upgrade: true
+  fan-config: ""
+  firewall-mode: instance
+  ftp-proxy: ""
+  http-proxy: ""
+  https-proxy: ""
+  ignore-machine-addresses: false
+  image-metadata-defaults-disabled: false
+  image-metadata-url: ""
+  image-stream: released
+  juju-ftp-proxy: ""
+  juju-http-proxy: ""
+  juju-https-proxy: ""
+  juju-no-proxy: 127.0.0.1,localhost,::1
+  logforward-enabled: false
+  logging-config: <root>=INFO
+  logging-output: ""
+  lxd-snap-channel: 5.0/stable
+  max-action-results-age: 336h
+  max-action-results-size: 5G
+  max-status-history-age: 336h
+  max-status-history-size: 5G
+  mode: requires-prompts
+  name: controller
+  net-bond-reconfigure-delay: 17
+  no-proxy: 127.0.0.1,localhost,::1
+  num-container-provision-workers: 4
+  num-provision-workers: 16
+  provisioner-harvest-mode: destroyed
+  proxy-ssh: false
+  resource-tags: {}
+  saas-ingress-allow: 0.0.0.0/0,::/0
+  secret-backend: auto
+  snap-http-proxy: ""
+  snap-https-proxy: ""
+  snap-store-assertions: ""
+  snap-store-proxy: ""
+  snap-store-proxy-url: ""
+  ssh-allow: 0.0.0.0/0,::/0
+  ssl-hostname-verification: true
+  test-mode: false
+  transmit-vendor-metrics: true
+  type: docker
+  update-status-hook-interval: 5m
+  uuid: 7b60ed78-1f35-4791-8bc5-ab8cfe0b1a9f
+controller-model-version: 0
+bootstrap-machine-constraints:
+  mem: 1536
+model-constraints: {}
+custom-image-metadata: "null"
+controller-cloud: |
+  name: a
+  type: docker
+  auth-types: [empty]
+  endpoint: unix:///var/run/docker.sock
+  regions:
+    default:
+      endpoint: unix:///var/run/docker.sock
+controller-cloud-region: default
+controller-cloud-credential-name: default
+controller-cloud-credential:
+  auth-type: empty
+controller-charm-channel:
+  track: "3.6"
+  risk: stable
+  branch: ""

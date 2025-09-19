@@ -420,6 +420,7 @@ func getEnviron(
 		Cloud:          cloudSpec,
 		Config:         modelConfig,
 	}
+
 	if cloud.CloudTypeIsCAAS(cloudSpec.Type) {
 		return caas.Open(stdcontext.TODO(), provider, openParams)
 	}

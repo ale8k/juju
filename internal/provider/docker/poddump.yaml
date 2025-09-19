@@ -1,0 +1,404 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: 0975e4dcbe73d538805fa75474ed8ac3af2faf75f74c3f0ed05d056c1938d467
+    cni.projectcalico.org/podIP: 10.1.90.139/32
+    cni.projectcalico.org/podIPs: 10.1.90.139/32
+    controller.juju.is/id: a3458422-151e-4706-80db-13eeb84fea2f
+    unit.juju.is/id: controller/0
+  creationTimestamp: "2025-09-19T20:52:17Z"
+  generateName: controller-
+  generation: 1
+  labels:
+    app.kubernetes.io/name: controller
+    apps.kubernetes.io/pod-index: "0"
+    controller-revision-hash: controller-85595d54b6
+    model.juju.is/disable-webhook: "true"
+    statefulset.kubernetes.io/pod-name: controller-0
+  name: controller-0
+  namespace: controller-test
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: controller
+    uid: fe97ffd1-d423-48ef-a764-ddaee4b8ea07
+  resourceVersion: "2326"
+  uid: 7a524415-1445-419b-ada2-5c99915680b1
+
+
+
+
+
+
+spec:
+  automountServiceAccountToken: true
+  containers:
+  - args:
+    - run
+    - --http
+    - :38812
+    - --verbose
+    command:
+    - /charm/bin/pebble
+    env:
+    - name: JUJU_CONTAINER_NAMES
+      value: api-server
+    image: ghcr.io/juju/charm-base:ubuntu-24.04
+    imagePullPolicy: IfNotPresent
+    name: charm
+    resources:
+      limits:
+        memory: 1536Mi
+      requests:
+        memory: 64Mi
+    securityContext:
+      runAsGroup: 170
+      runAsUser: 170
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /charm/bin
+      name: charm-data
+      readOnly: true
+      subPath: charm/bin
+    - mountPath: /charm/containers
+      name: charm-data
+      subPath: charm/containers
+    - mountPath: /var/lib/pebble/default
+      name: charm-data
+      subPath: containeragent/pebble
+    - mountPath: /var/log/juju
+      name: charm-data
+      subPath: containeragent/var/log/juju
+    - mountPath: /usr/bin/juju-introspect
+      name: charm-data
+      readOnly: true
+      subPath: charm/bin/containeragent
+    - mountPath: /usr/bin/juju-exec
+      name: charm-data
+      readOnly: true
+      subPath: charm/bin/containeragent
+    - mountPath: /etc/profile.d/juju-introspection.sh
+      name: charm-data
+      readOnly: true
+      subPath: containeragent/etc/profile.d/juju-introspection.sh
+    - mountPath: /var/lib/juju/template-agent.conf
+      name: controller-agent-conf
+      subPath: controller-unit-agent.conf
+    - mountPath: /var/lib/juju
+      name: storage
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-nnp5j
+      readOnly: true
+    workingDir: /var/lib/juju
+
+
+
+  - args:
+    - -c
+    - printf 'args="--dbpath=/var/lib/juju/db --tlsCertificateKeyFile=/var/lib/juju/server.pem
+      --tlsCertificateKeyFilePassword=ignored --tlsMode=requireTLS --port=37017 --journal
+      --replSet=juju --quiet --oplogSize=1024 --auth --keyFile=/var/lib/juju/shared-secret
+      --storageEngine=wiredTiger --bind_ip_all"\nipv6Disabled=$(sysctl net.ipv6.conf.all.disable_ipv6
+      -n)\nif [ $ipv6Disabled -eq 0 ]; then\n  args="${args} --ipv6"\nfi\nSHARED_SECRET_SRC="/var/lib/juju/shared-secret.temp"\nSHARED_SECRET_DST="/var/lib/juju/shared-secret"\nrm
+      "${SHARED_SECRET_DST}" || true\ncp "${SHARED_SECRET_SRC}" "${SHARED_SECRET_DST}"\nchown
+      170:170 "${SHARED_SECRET_DST}"\nchmod 600 "${SHARED_SECRET_DST}"\nls -lah "${SHARED_SECRET_DST}"\nwhile
+      [ ! -f "/var/lib/juju/server.pem" ]; do\n  echo "Waiting for /var/lib/juju/server.pem
+      to be created..."\n  sleep 1\ndone\nexec mongod ${args}\n'>/tmp/mongo.sh &&
+      chmod a+x /tmp/mongo.sh && exec /tmp/mongo.sh
+    command:
+    - /bin/sh
+    image: ghcr.io/juju/juju-db:4.4
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      exec:
+        command:
+        - mongo
+        - --port=37017
+        - --tls
+        - --tlsAllowInvalidHostnames
+        - --tlsAllowInvalidCertificates
+        - --tlsCertificateKeyFile=/var/lib/juju/server.pem
+        - --eval
+        - db.adminCommand('ping')
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: mongodb
+    ports:
+    - containerPort: 37017
+      name: mongodb
+      protocol: TCP
+    readinessProbe:
+      exec:
+        command:
+        - mongo
+        - --port=37017
+        - --tls
+        - --tlsAllowInvalidHostnames
+        - --tlsAllowInvalidCertificates
+        - --tlsCertificateKeyFile=/var/lib/juju/server.pem
+        - --eval
+        - db.adminCommand('ping')
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources: {}
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsGroup: 170
+      runAsUser: 170
+    startupProbe:
+      exec:
+        command:
+        - mongo
+        - --port=37017
+        - --tls
+        - --tlsAllowInvalidHostnames
+        - --tlsAllowInvalidCertificates
+        - --tlsCertificateKeyFile=/var/lib/juju/server.pem
+        - --eval
+        - db.adminCommand('ping')
+      failureThreshold: 120
+      initialDelaySeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/log
+      name: mongo-scratch
+      subPath: var/log
+    - mountPath: /tmp
+      name: mongo-scratch
+      subPath: tmp
+    - mountPath: /var/lib/juju
+      name: storage
+    - mountPath: /var/lib/juju/db
+      name: storage
+      subPath: db
+    - mountPath: /var/lib/juju/template-server.pem
+      name: controller-server-pem
+      readOnly: true
+      subPath: template-server.pem
+    - mountPath: /var/lib/juju/shared-secret.temp
+      name: controller-shared-secret
+      readOnly: true
+      subPath: shared-secret
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-nnp5j
+      readOnly: true
+
+
+
+  - args:
+    - -c
+    - |
+      export JUJU_DATA_DIR=/var/lib/juju
+      export JUJU_TOOLS_DIR=$JUJU_DATA_DIR/tools
+
+      mkdir -p $JUJU_TOOLS_DIR
+      cp /opt/jujud $JUJU_TOOLS_DIR/jujud
+
+      test -e $JUJU_DATA_DIR/agents/controller-0/agent.conf || $JUJU_TOOLS_DIR/jujud bootstrap-state $JUJU_DATA_DIR/bootstrap-params --data-dir $JUJU_DATA_DIR --show-log --timeout 20m0s
+
+      mkdir -p /var/lib/pebble/default/layers
+      cat > /var/lib/pebble/default/layers/001-jujud.yaml <<EOF
+      summary: jujud service
+      services:
+          jujud:
+              summary: Juju controller agent
+              startup: enabled
+              override: replace
+              command: $JUJU_TOOLS_DIR/jujud machine --data-dir $JUJU_DATA_DIR --controller-id 0 --log-to-stderr --show-log
+
+      EOF
+
+      exec /opt/pebble run --http :38811 --verbose
+    command:
+    - /bin/sh
+    env:
+    - name: JUJU_CONTAINER_NAME
+      value: api-server
+    - name: PEBBLE_SOCKET
+      value: /charm/container/pebble.socket
+    envFrom:
+    - secretRef:
+        name: controller-application-config
+    image: ghcr.io/juju/jujud-operator:3.6.10
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 2
+      httpGet:
+        path: /v1/health?level=alive
+        port: 38811
+        scheme: HTTP
+      initialDelaySeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 3
+    name: api-server
+    readinessProbe:
+      failureThreshold: 2
+      httpGet:
+        path: /v1/health?level=ready
+        port: 38811
+        scheme: HTTP
+      initialDelaySeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 3
+    resources: {}
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsGroup: 170
+      runAsUser: 170
+    startupProbe:
+      failureThreshold: 200
+      httpGet:
+        path: /v1/health?level=alive
+        port: 38811
+        scheme: HTTP
+      initialDelaySeconds: 3
+      periodSeconds: 3
+      successThreshold: 1
+      timeoutSeconds: 3
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /tmp
+      name: apiserver-scratch
+      subPath: tmp
+    - mountPath: /var/lib/pebble
+      name: apiserver-scratch
+      subPath: var/lib/pebble
+    - mountPath: /var/log/juju
+      name: apiserver-scratch
+      subPath: var/log/juju
+    - mountPath: /var/lib/juju
+      name: storage
+    - mountPath: /var/lib/juju/agents/controller-0
+      name: storage
+      subPath: agents/controller-0
+    - mountPath: /var/lib/juju/agents/controller-0/template-agent.conf
+      name: controller-agent-conf
+      readOnly: true
+      subPath: controller-agent.conf
+    - mountPath: /var/lib/juju/template-server.pem
+      name: controller-server-pem
+      readOnly: true
+      subPath: template-server.pem
+    - mountPath: /var/lib/juju/shared-secret
+      name: controller-shared-secret
+      readOnly: true
+      subPath: shared-secret
+    - mountPath: /var/lib/juju/bootstrap-params
+      name: controller-bootstrap-params
+      readOnly: true
+      subPath: bootstrap-params
+    - mountPath: /charm/container
+      name: charm-data
+      subPath: charm/containers/api-server
+    - mountPath: /etc/profile.d/juju-introspection.sh
+      name: charm-data
+      readOnly: true
+      subPath: containeragent/etc/profile.d/juju-introspection.sh
+    - mountPath: /usr/bin/juju-introspect
+      name: charm-data
+      readOnly: true
+      subPath: charm/bin/containeragent
+    - mountPath: /usr/bin/juju-exec
+      name: charm-data
+      readOnly: true
+      subPath: charm/bin/containeragent
+    - mountPath: /usr/bin/juju-dumplogs
+      name: charm-data
+      readOnly: true
+      subPath: charm/bin/containeragent
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-nnp5j
+      readOnly: true
+    workingDir: /var/lib/juju
+
+
+
+  initContainers:
+  - args:
+    - init
+    - --containeragent-pebble-dir
+    - /containeragent/pebble
+    - --charm-modified-version
+    - "0"
+    - --data-dir
+    - /var/lib/juju
+    - --bin-dir
+    - /charm/bin
+    - --profile-dir
+    - /containeragent/etc/profile.d
+    - --pebble-identities-file
+    - /charm/etc/pebble/identities.yaml
+    - --pebble-charm-identity
+    - "170"
+    - --controller
+    command:
+    - /opt/containeragent
+    env:
+    - name: JUJU_CONTAINER_NAMES
+      value: api-server
+    - name: JUJU_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: JUJU_K8S_POD_UUID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    envFrom:
+    - secretRef:
+        name: controller-application-config
+    image: ghcr.io/juju/jujud-operator:3.6.10
+    imagePullPolicy: IfNotPresent
+    name: charm-init
+    resources: {}
+    securityContext:
+      runAsGroup: 170
+      runAsUser: 170
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/lib/juju
+      name: charm-data
+      subPath: var/lib/juju
+    - mountPath: /charm/bin
+      name: charm-data
+      subPath: charm/bin
+    - mountPath: /charm/containers
+      name: charm-data
+      subPath: charm/containers
+    - mountPath: /containeragent/pebble
+      name: charm-data
+      subPath: containeragent/pebble
+    - mountPath: /containeragent/etc/profile.d
+      name: charm-data
+      subPath: containeragent/etc/profile.d
+    - mountPath: /charm/etc/pebble/
+      name: charm-data
+      subPath: charm/etc/pebble/
+    - mountPath: /var/lib/juju/template-agent.conf
+      name: controller-agent-conf
+      subPath: controller-unit-agent.conf
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-nnp5j
+      readOnly: true
+    workingDir: /var/lib/juju
+

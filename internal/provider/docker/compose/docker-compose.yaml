@@ -1,0 +1,458 @@
+services:
+  controller:
+    # This is a locally build image containing the docker provider and new docker CAAS cloud type.
+    image: ghcr.io/juju/jujud-operator:3.6.10
+    environment:
+      # `JUJU_CONTEXT_ID`, `JUJU_AGENT_SOCKET_NETWORK` and `JUJU_AGENT_SOCKET_ADDRESS` are used by the hook commands to connect to the local agent.
+      # docs/reference/hook.md
+      JUJU_CONTEXT_ID: 1
+      JUJU_AGENT_SOCKET_ADDRESS: 1
+      JUJU_AGENT_SOCKET_NETWORK: 1
+    command: 
+      - |
+        mkdir -p /var/lib/juju/agents/controller-0
+
+        cat <<TEMPLATESERVERPEM >/var/lib/juju/template-server.pem
+        -----BEGIN CERTIFICATE-----
+        MIIEfTCCAuWgAwIBAgIUJ4MNPb1nAFhRzqNEMmHfl3NR/QowDQYJKoZIhvcNAQEL
+        BQAwITENMAsGA1UEChMESnVqdTEQMA4GA1UEAxMHanVqdS1jYTAeFw0yNTA5MTQx
+        NTU2MTZaFw0zNTA5MTQxNjAxMTZaMG0xDTALBgNVBAoTBEp1anUxLTArBgNVBAMT
+        JEp1anUgc2VydmVyIGNlcnRpZmljYXRlIC0gY29udHJvbGxlcjEtMCsGA1UEBRMk
+        MTFlOTNmZTctMmU1ZS00M2FhLTg0OTItYjEyY2VkZTNjNmU3MIIBojANBgkqhkiG
+        9w0BAQEFAAOCAY8AMIIBigKCAYEAyqXQy/6plqMOvuRMlCUGqFsf8uSS2RPrH5rZ
+        YO+Wr7GHQVKA2mD/db2+DRsaMPr3A4XzWwKqKKzYztDmKs+4/JtQHerVCUmTyCVW
+        lCKZcNmHmOjKIrUftpzFmEawvL7WROEPcR+8a7mvQG+hFjEElnyOjnSbSM86sZ6/
+        Cbau7mYYxIOuQ10/al4LDnDNBykltd07Q2xRpxFrNJUk8x9YZ0m8IAYMVOQtirUZ
+        LlKTKwA/ynyPmeU2NwQcU8xycHh6tCdTG1LbAzj/ygpNi7o+rvV0FV71uOVGfvQJ
+        mbjoD+K9SQkd8JQ+ezLycjUmYVjPtfvrSfZ+O+5oM1Txpn+l6inBicqhovc8ifME
+        hTXGy19F0sBL9MXBcr87VeQh6nqZw7jtokJOADJZVodYMthoeKN4bP3BBGQpgOcN
+        ww5t2XXhhwTZelwg5Xmr+bx0K1CrbRBJo5xt1vl2uIFgWX3AAfl5PVOvnEqH71Vs
+        a2WahqHoQT/CCZfcUiDNRxndVtTnAgMBAAGjYTBfMB8GA1UdIwQYMBaAFKDhSUJu
+        aJ+DXw+ULIdDYtWhVqx0MDwGA1UdEQQ1MDOCCGFueXRoaW5ngglsb2NhbGhvc3SC
+        Dmp1anUtYXBpc2VydmVyggxqdWp1LW1vbmdvZGIwDQYJKoZIhvcNAQELBQADggGB
+        AJcL6tnR6qge2/aDZ6x4dSB730aOWcH9BDcMxxo4cuGcsC7AZXqRiNaznT/q8s0L
+        A/CwcalP9fq3EVStMKzCrWWBkK51NLbXEntfyoMc8v4BqV5gpAypfNCt8EzU8vXa
+        L/o7sWYXmyruIcCH8tM1F7km8lNcTS4P5Nb58q0SFBhHmXd0dZH7zeIm5Tg3/IOT
+        Vwl4GbVY6yWqQL7qDeLvLn2bvQi5JJFu5eQ7o9pFW4yKogiFezEDzv/To1NHoiQ9
+        WYLEpa3RaxUPFAhH94ZTOBCQUOGbtATVr2NVpve99BW/IU8ET1C+3hTF4SWj8Vm5
+        W8tm2osIp5KH6YNlUnZbeFzHRIhM8k5aL0595kXU56+QzOfqmHCaP58CDScn33X5
+        6d6Q3bowI1OOLaLpC0lsEYae/GojGzBBgW6HhpP1830qoIXIyRDnAWLLwbqAIQqP
+        JfUnqnLLvgBySgTxB6rtDEw7NHcW+w0NT9QfzHf44S1RI8Sz9qW7PBu9+wQ03zPX
+        qA==
+        -----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        MIIEEzCCAnugAwIBAgIVAIRFIL2V6EBIvyR4RGoX+C94tfJ0MA0GCSqGSIb3DQEB
+        CwUAMCExDTALBgNVBAoTBEp1anUxEDAOBgNVBAMTB2p1anUtY2EwHhcNMjUwOTE0
+        MTU1NjE2WhcNMzUwOTE0MTYwMTE2WjAhMQ0wCwYDVQQKEwRKdWp1MRAwDgYDVQQD
+        EwdqdWp1LWNhMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmXEcf7Tm
+        FKd9OUx55Bk1A2fa2RxLvCAY+eQttkAr4nEH5y+yjC7TwfbJhoeZkQRsL7qNec7j
+        TQCA1+wSbUV7vPltiza/H5ePfGXMZuXO937ni+j8Kx/oVzrzX2sF5Fs2R4/4FHBN
+        2u0SMj5hyWN4LKjlJoi205efijIWZAPr3hTdd4VRJRN0e/9p/D+ZZvktJUxlteXw
+        CdcZ4eyQhCKQ5oQr98Fm6SWvT49bUuBNVhl4dDXHXvJ3iz7fD0lVPktv6T7rQ2yw
+        mQvetuB0fbMbpeCsOZGsP24ACtmoPw63PlWgms5WVG+u0IqpkcCFqBzYLsSpmiTh
+        e0l0dw+RE5k4lrrWN5hSiRPFO1uI0PkrLUOxXa9b5YqF0ycTyhZm05w24/X5vxhe
+        B19AxD1EPolJXCXdwR/JIpn1t33BhvhTieMbNfOJqNQD9fJmJrN0lHFciGEDvBI6
+        HOJbXbxsB+SUdLe6MBBI/t+n3Q0LLhVLfrTHFU4XvntwDx9OazQ9JkR9AgMBAAGj
+        QjBAMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSg
+        4UlCbmifg18PlCyHQ2LVoVasdDANBgkqhkiG9w0BAQsFAAOCAYEAjYY63mWmyAv1
+        4IzsIn1geTl7Wa3A+o134LYV19ErrzZHyj93pCAQJrjk5B4XA9ba+r4ejoJ8DAUn
+        WDezQX9jOkAyUTYvRMIpwd/amdz1svt7MoMQT5o9bMB7N1yuqlkvSU51Hi3jcmxW
+        kiw9vWZOOOcufgaaGtB49WBdTdKRId7siWYK2JILCLpp7Kzm/NekA7mPCXlchUNv
+        l5EmJiP7t7NF+fRg6JddI54mshKqVpQzLZ/omByhNQ40t8YzI3QkpcCKyJy1SIrU
+        Rq7woPfXw+E3lVcmM/Fap7JlT95zpx2MXBQxg4djeuPkGCuMUYIf5LdfrS6o7YVi
+        71MhNjDd9NsUYBl6Z1D4TX7WR1jlt6ny4Wi+WGo9ViidFCoeq8tmy2G3knWAEgyh
+        HJL1EgKzdlIZGayKHx4o0bTNZsYJ4Sahc5OFbnCfomOVivv62JsiLyS+f9aikXkI
+        w7kpt0iBvO4XJuF9gmw1tba5pn9lcrDAHP0b3F5ukwiXhRtCGWK8
+        -----END CERTIFICATE-----
+
+        -----BEGIN PRIVATE KEY-----
+        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
+        LUJGH4diXZiGBalgMBYJApxs
+        -----END PRIVATE KEY-----
+        TEMPLATESERVERPEM
+
+        cat <<AGENTCONF >/var/lib/juju/agents/controller-0/agent.conf
+        # format 2.0
+        tag: controller-0
+        datadir: /var/lib/juju
+        transient-datadir: /var/run/juju
+        logdir: /var/log/juju
+        metricsspooldir: /var/lib/juju/metricspool
+        upgradedToVersion: 3.6.8
+        cacert: |
+          -----BEGIN CERTIFICATE-----
+          MIIEEzCCAnugAwIBAgIVAIRFIL2V6EBIvyR4RGoX+C94tfJ0MA0GCSqGSIb3DQEB
+          CwUAMCExDTALBgNVBAoTBEp1anUxEDAOBgNVBAMTB2p1anUtY2EwHhcNMjUwOTE0
+          MTU1NjE2WhcNMzUwOTE0MTYwMTE2WjAhMQ0wCwYDVQQKEwRKdWp1MRAwDgYDVQQD
+          EwdqdWp1LWNhMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmXEcf7Tm
+          FKd9OUx55Bk1A2fa2RxLvCAY+eQttkAr4nEH5y+yjC7TwfbJhoeZkQRsL7qNec7j
+          TQCA1+wSbUV7vPltiza/H5ePfGXMZuXO937ni+j8Kx/oVzrzX2sF5Fs2R4/4FHBN
+          2u0SMj5hyWN4LKjlJoi205efijIWZAPr3hTdd4VRJRN0e/9p/D+ZZvktJUxlteXw
+          CdcZ4eyQhCKQ5oQr98Fm6SWvT49bUuBNVhl4dDXHXvJ3iz7fD0lVPktv6T7rQ2yw
+          mQvetuB0fbMbpeCsOZGsP24ACtmoPw63PlWgms5WVG+u0IqpkcCFqBzYLsSpmiTh
+          e0l0dw+RE5k4lrrWN5hSiRPFO1uI0PkrLUOxXa9b5YqF0ycTyhZm05w24/X5vxhe
+          B19AxD1EPolJXCXdwR/JIpn1t33BhvhTieMbNfOJqNQD9fJmJrN0lHFciGEDvBI6
+          HOJbXbxsB+SUdLe6MBBI/t+n3Q0LLhVLfrTHFU4XvntwDx9OazQ9JkR9AgMBAAGj
+          QjBAMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSg
+          4UlCbmifg18PlCyHQ2LVoVasdDANBgkqhkiG9w0BAQsFAAOCAYEAjYY63mWmyAv1
+          4IzsIn1geTl7Wa3A+o134LYV19ErrzZHyj93pCAQJrjk5B4XA9ba+r4ejoJ8DAUn
+          WDezQX9jOkAyUTYvRMIpwd/amdz1svt7MoMQT5o9bMB7N1yuqlkvSU51Hi3jcmxW
+          kiw9vWZOOOcufgaaGtB49WBdTdKRId7siWYK2JILCLpp7Kzm/NekA7mPCXlchUNv
+          l5EmJiP7t7NF+fRg6JddI54mshKqVpQzLZ/omByhNQ40t8YzI3QkpcCKyJy1SIrU
+          Rq7woPfXw+E3lVcmM/Fap7JlT95zpx2MXBQxg4djeuPkGCuMUYIf5LdfrS6o7YVi
+          71MhNjDd9NsUYBl6Z1D4TX7WR1jlt6ny4Wi+WGo9ViidFCoeq8tmy2G3knWAEgyh
+          HJL1EgKzdlIZGayKHx4o0bTNZsYJ4Sahc5OFbnCfomOVivv62JsiLyS+f9aikXkI
+          w7kpt0iBvO4XJuF9gmw1tba5pn9lcrDAHP0b3F5ukwiXhRtCGWK8
+          -----END CERTIFICATE-----
+        statepassword: iA2JrG1S1rGe/t8l3aTKH4iB
+        controller: controller-d46ecf3f-fd7e-4982-8be8-7110e6167565
+        model: model-e8d9713e-5bde-4813-87bb-2d22205fbc6f
+        apiaddresses:
+        - localhost:17070
+        apipassword: iA2JrG1S1rGe/t8l3aTKH4iB
+        oldpassword: 5c7de3b5d4b3c2d0dbc7584d2eb6957d
+        values:
+          PROVIDER_TYPE: kubernetes
+        agent-logfile-max-size: 0
+        agent-logfile-max-backups: 0
+        controllercert: |
+          -----BEGIN CERTIFICATE-----
+          MIIEfTCCAuWgAwIBAgIUJ4MNPb1nAFhRzqNEMmHfl3NR/QowDQYJKoZIhvcNAQEL
+          BQAwITENMAsGA1UEChMESnVqdTEQMA4GA1UEAxMHanVqdS1jYTAeFw0yNTA5MTQx
+          NTU2MTZaFw0zNTA5MTQxNjAxMTZaMG0xDTALBgNVBAoTBEp1anUxLTArBgNVBAMT
+          JEp1anUgc2VydmVyIGNlcnRpZmljYXRlIC0gY29udHJvbGxlcjEtMCsGA1UEBRMk
+          MTFlOTNmZTctMmU1ZS00M2FhLTg0OTItYjEyY2VkZTNjNmU3MIIBojANBgkqhkiG
+          9w0BAQEFAAOCAY8AMIIBigKCAYEAyqXQy/6plqMOvuRMlCUGqFsf8uSS2RPrH5rZ
+          YO+Wr7GHQVKA2mD/db2+DRsaMPr3A4XzWwKqKKzYztDmKs+4/JtQHerVCUmTyCVW
+          lCKZcNmHmOjKIrUftpzFmEawvL7WROEPcR+8a7mvQG+hFjEElnyOjnSbSM86sZ6/
+          Cbau7mYYxIOuQ10/al4LDnDNBykltd07Q2xRpxFrNJUk8x9YZ0m8IAYMVOQtirUZ
+          LlKTKwA/ynyPmeU2NwQcU8xycHh6tCdTG1LbAzj/ygpNi7o+rvV0FV71uOVGfvQJ
+          mbjoD+K9SQkd8JQ+ezLycjUmYVjPtfvrSfZ+O+5oM1Txpn+l6inBicqhovc8ifME
+          hTXGy19F0sBL9MXBcr87VeQh6nqZw7jtokJOADJZVodYMthoeKN4bP3BBGQpgOcN
+          ww5t2XXhhwTZelwg5Xmr+bx0K1CrbRBJo5xt1vl2uIFgWX3AAfl5PVOvnEqH71Vs
+          a2WahqHoQT/CCZfcUiDNRxndVtTnAgMBAAGjYTBfMB8GA1UdIwQYMBaAFKDhSUJu
+          aJ+DXw+ULIdDYtWhVqx0MDwGA1UdEQQ1MDOCCGFueXRoaW5ngglsb2NhbGhvc3SC
+          Dmp1anUtYXBpc2VydmVyggxqdWp1LW1vbmdvZGIwDQYJKoZIhvcNAQELBQADggGB
+          AJcL6tnR6qge2/aDZ6x4dSB730aOWcH9BDcMxxo4cuGcsC7AZXqRiNaznT/q8s0L
+          A/CwcalP9fq3EVStMKzCrWWBkK51NLbXEntfyoMc8v4BqV5gpAypfNCt8EzU8vXa
+          L/o7sWYXmyruIcCH8tM1F7km8lNcTS4P5Nb58q0SFBhHmXd0dZH7zeIm5Tg3/IOT
+          Vwl4GbVY6yWqQL7qDeLvLn2bvQi5JJFu5eQ7o9pFW4yKogiFezEDzv/To1NHoiQ9
+          WYLEpa3RaxUPFAhH94ZTOBCQUOGbtATVr2NVpve99BW/IU8ET1C+3hTF4SWj8Vm5
+          W8tm2osIp5KH6YNlUnZbeFzHRIhM8k5aL0595kXU56+QzOfqmHCaP58CDScn33X5
+          6d6Q3bowI1OOLaLpC0lsEYae/GojGzBBgW6HhpP1830qoIXIyRDnAWLLwbqAIQqP
+          JfUnqnLLvgBySgTxB6rtDEw7NHcW+w0NT9QfzHf44S1RI8Sz9qW7PBu9+wQ03zPX
+          qA==
+          -----END CERTIFICATE-----
+          -----BEGIN CERTIFICATE-----
+          MIIEEzCCAnugAwIBAgIVAIRFIL2V6EBIvyR4RGoX+C94tfJ0MA0GCSqGSIb3DQEB
+          CwUAMCExDTALBgNVBAoTBEp1anUxEDAOBgNVBAMTB2p1anUtY2EwHhcNMjUwOTE0
+          MTU1NjE2WhcNMzUwOTE0MTYwMTE2WjAhMQ0wCwYDVQQKEwRKdWp1MRAwDgYDVQQD
+          EwdqdWp1LWNhMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmXEcf7Tm
+          FKd9OUx55Bk1A2fa2RxLvCAY+eQttkAr4nEH5y+yjC7TwfbJhoeZkQRsL7qNec7j
+          TQCA1+wSbUV7vPltiza/H5ePfGXMZuXO937ni+j8Kx/oVzrzX2sF5Fs2R4/4FHBN
+          2u0SMj5hyWN4LKjlJoi205efijIWZAPr3hTdd4VRJRN0e/9p/D+ZZvktJUxlteXw
+          CdcZ4eyQhCKQ5oQr98Fm6SWvT49bUuBNVhl4dDXHXvJ3iz7fD0lVPktv6T7rQ2yw
+          mQvetuB0fbMbpeCsOZGsP24ACtmoPw63PlWgms5WVG+u0IqpkcCFqBzYLsSpmiTh
+          e0l0dw+RE5k4lrrWN5hSiRPFO1uI0PkrLUOxXa9b5YqF0ycTyhZm05w24/X5vxhe
+          B19AxD1EPolJXCXdwR/JIpn1t33BhvhTieMbNfOJqNQD9fJmJrN0lHFciGEDvBI6
+          HOJbXbxsB+SUdLe6MBBI/t+n3Q0LLhVLfrTHFU4XvntwDx9OazQ9JkR9AgMBAAGj
+          QjBAMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSg
+          4UlCbmifg18PlCyHQ2LVoVasdDANBgkqhkiG9w0BAQsFAAOCAYEAjYY63mWmyAv1
+          4IzsIn1geTl7Wa3A+o134LYV19ErrzZHyj93pCAQJrjk5B4XA9ba+r4ejoJ8DAUn
+          WDezQX9jOkAyUTYvRMIpwd/amdz1svt7MoMQT5o9bMB7N1yuqlkvSU51Hi3jcmxW
+          kiw9vWZOOOcufgaaGtB49WBdTdKRId7siWYK2JILCLpp7Kzm/NekA7mPCXlchUNv
+          l5EmJiP7t7NF+fRg6JddI54mshKqVpQzLZ/omByhNQ40t8YzI3QkpcCKyJy1SIrU
+          Rq7woPfXw+E3lVcmM/Fap7JlT95zpx2MXBQxg4djeuPkGCuMUYIf5LdfrS6o7YVi
+          71MhNjDd9NsUYBl6Z1D4TX7WR1jlt6ny4Wi+WGo9ViidFCoeq8tmy2G3knWAEgyh
+          HJL1EgKzdlIZGayKHx4o0bTNZsYJ4Sahc5OFbnCfomOVivv62JsiLyS+f9aikXkI
+          w7kpt0iBvO4XJuF9gmw1tba5pn9lcrDAHP0b3F5ukwiXhRtCGWK8
+          -----END CERTIFICATE-----
+        controllerkey: |
+          -----BEGIN PRIVATE KEY-----
+          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
+          LUJGH4diXZiGBalgMBYJApxs
+          -----END PRIVATE KEY-----
+        caprivatekey: |
+          -----BEGIN PRIVATE KEY-----
+          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
+          UIxpSiQa4SthNnXegMGipzeZ
+          -----END PRIVATE KEY-----
+        apiport: 17070
+        stateport: 37017
+        sharedsecret: rq9GF1A/ZLmsiCXHTTuRZg1rwh4R9hyrQKFxo4S16ivPU7VJLlPmkpJyRsEL8ILaJXPXjH1FVJZOoL0oxSnMzwu4Fy3vbsyQn4EqBHqQEsR/gvMLyEzn/vsdLEp4BYF/9h6BwRL4h/itmah8pDQj5Jha0Gg69L6ojWymULzOY9AuZ+1gWwv8zR8U2qpiwx95IIpaT+2O2uhu1lKZ8mzXTu28SduCuicRmuthMuDEdZ0GIvcKol2Ss1VmBmfUX3RXqqN/QguLfun0tAZ5j6Vi6ZsdeSA9+JsKHjIVcgCreo8GIklilh2SeaZy7nOtUMdwY6u2+R936HLTlHd7cGXwl69SoBskVwMQW7GWgmcGsELaJPlzcZKKupGkBzZHsf2Ip0DI5rsi1h4/3fbyV4O8yhBbkX/Q08fAx4aawvLGA/hrufwBTxndnQstRwYVS+GNU5LHsIcCadvrB51EjYHbfIQHbdxvEjDkcqsvgC/pV8nbtTXssZiEyxNenWXEthTCTf4oRh+voOnKQr7PCgCQluHz+1CGBwStzCiLWe4Ecid9C4zGqnBwKglChWbi4knVvuH877NDAx4lGB3lok49QC2FoTSe+95qDhXUiTM0Ti57Lul//wwfTugng/6Z7igq8F0yFeF4/iFvef0pK0s16wBz/IeVDCOor9WzogE61UcvhlT7IoxNoM2PpalUtLqUwZo7vVv3T8rG1dZwG7vrpq60aDTEpM0ZhhevdG/oi3tSLCXBZ8MkmmS3Mob8LIStDUAlDdvrUWFd8CKHsNRDQHJB/ZNkuIW6LajFmdY9ex17qVZ6dj/U/8ThzKtDKCENiVY7b5LAmFYldwOz0LFcoC/n9Hpijc/CD2vzUS5X7sDHR0ZEdjKFW3iLKKwCAQ72gJFjF2ZsBLR0/qOm0uhA7UpXHPmL2uft/UNWyZUKwdudzB+V7b60ZM9C7TDDeAWQZ4dnARHLLupBwq75kcz6Emmh8/qODi/JnyEzqGNoeaifCprZZ9/oGQc14YkSOW85
+        mongomemoryprofile: default
+        juju-db-snap-channel: 4.4/stable
+        querytracingthreshold: 1s
+        AGENTCONF
+
+        cat <<BOOTSTRAPPARAMS >/var/lib/juju/bootstrap-params
+        controller-config:
+          agent-logfile-max-backups: 2
+          agent-logfile-max-size: 100M
+          api-port: 17070
+          api-port-open-delay: 2s
+          audit-log-capture-args: false
+          audit-log-exclude-methods:
+          - ReadOnlyMethods
+          audit-log-max-backups: 10
+          audit-log-max-size: 300M
+          auditing-enabled: true
+          ca-cert: |
+            -----BEGIN CERTIFICATE-----
+            MIIEEzCCAnugAwIBAgIVAIRFIL2V6EBIvyR4RGoX+C94tfJ0MA0GCSqGSIb3DQEB
+            CwUAMCExDTALBgNVBAoTBEp1anUxEDAOBgNVBAMTB2p1anUtY2EwHhcNMjUwOTE0
+            MTU1NjE2WhcNMzUwOTE0MTYwMTE2WjAhMQ0wCwYDVQQKEwRKdWp1MRAwDgYDVQQD
+            EwdqdWp1LWNhMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmXEcf7Tm
+            FKd9OUx55Bk1A2fa2RxLvCAY+eQttkAr4nEH5y+yjC7TwfbJhoeZkQRsL7qNec7j
+            TQCA1+wSbUV7vPltiza/H5ePfGXMZuXO937ni+j8Kx/oVzrzX2sF5Fs2R4/4FHBN
+            2u0SMj5hyWN4LKjlJoi205efijIWZAPr3hTdd4VRJRN0e/9p/D+ZZvktJUxlteXw
+            CdcZ4eyQhCKQ5oQr98Fm6SWvT49bUuBNVhl4dDXHXvJ3iz7fD0lVPktv6T7rQ2yw
+            mQvetuB0fbMbpeCsOZGsP24ACtmoPw63PlWgms5WVG+u0IqpkcCFqBzYLsSpmiTh
+            e0l0dw+RE5k4lrrWN5hSiRPFO1uI0PkrLUOxXa9b5YqF0ycTyhZm05w24/X5vxhe
+            B19AxD1EPolJXCXdwR/JIpn1t33BhvhTieMbNfOJqNQD9fJmJrN0lHFciGEDvBI6
+            HOJbXbxsB+SUdLe6MBBI/t+n3Q0LLhVLfrTHFU4XvntwDx9OazQ9JkR9AgMBAAGj
+            QjBAMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSg
+            4UlCbmifg18PlCyHQ2LVoVasdDANBgkqhkiG9w0BAQsFAAOCAYEAjYY63mWmyAv1
+            4IzsIn1geTl7Wa3A+o134LYV19ErrzZHyj93pCAQJrjk5B4XA9ba+r4ejoJ8DAUn
+            WDezQX9jOkAyUTYvRMIpwd/amdz1svt7MoMQT5o9bMB7N1yuqlkvSU51Hi3jcmxW
+            kiw9vWZOOOcufgaaGtB49WBdTdKRId7siWYK2JILCLpp7Kzm/NekA7mPCXlchUNv
+            l5EmJiP7t7NF+fRg6JddI54mshKqVpQzLZ/omByhNQ40t8YzI3QkpcCKyJy1SIrU
+            Rq7woPfXw+E3lVcmM/Fap7JlT95zpx2MXBQxg4djeuPkGCuMUYIf5LdfrS6o7YVi
+            71MhNjDd9NsUYBl6Z1D4TX7WR1jlt6ny4Wi+WGo9ViidFCoeq8tmy2G3knWAEgyh
+            HJL1EgKzdlIZGayKHx4o0bTNZsYJ4Sahc5OFbnCfomOVivv62JsiLyS+f9aikXkI
+            w7kpt0iBvO4XJuF9gmw1tba5pn9lcrDAHP0b3F5ukwiXhRtCGWK8
+            -----END CERTIFICATE-----
+          controller-name: j
+          controller-uuid: d46ecf3f-fd7e-4982-8be8-7110e6167565
+          juju-db-snap-channel: 4.4/stable
+          jujud-controller-snap-source: legacy
+          max-agent-state-size: 524288
+          max-charm-state-size: 2097152
+          max-debug-log-duration: 24h0m0s
+          max-prune-txn-batch-size: 1000000
+          max-prune-txn-passes: 100
+          max-txn-log-size: 10M
+          metering-url: https://api.jujucharms.com/omnibus/v3
+          migration-agent-wait-time: 15m0s
+          model-logfile-max-backups: 2
+          model-logfile-max-size: 10M
+          model-logs-size: 20M
+          mongo-memory-profile: default
+          prune-txn-query-count: 1000
+          prune-txn-sleep-time: 10ms
+          query-tracing-enabled: false
+          query-tracing-threshold: 1s
+          set-numa-control-policy: false
+          ssh-max-concurrent-connections: 100
+          ssh-server-port: 17022
+          state-port: 37017
+        controller-model-config:
+          agent-metadata-url: ""
+          agent-stream: released
+          agent-version: 3.6.8
+          apt-ftp-proxy: ""
+          apt-http-proxy: ""
+          apt-https-proxy: ""
+          apt-mirror: ""
+          apt-no-proxy: ""
+          authorized-keys: |
+            ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDT0tJ5ZGHyYnl9XXIEoavHeKdk811sgWg3LVhIAi6GZ2JseN+QgicQZA1dSU8b/8osjZKC7RlZce0e8Flzps/7CFwn/qUrcmKCY0t0BcueHv3DfQSVpVO7HEvN1QyKyH5ANVTJpv8cm/tuaFJ9eFvFYHIqB25VHLfsN40jHW+wj3WrDg/J5TfNJ15bUiP8OS72j+Du3pXzThE2QFy5lYmyBg9dq5qiExu68oBmpohbKDvfN+UXJbqvjt0MMBrwNKZjAc9hbP8jtI2I9RwnrHY9WwY7734ieiyS3iRjvKcc8INvxQKZRaCNFiem+9jvXOYIKBXsgTqf/bGya0W+Jk9drv0of4bo+LZXKI/Skudz5Nt72bd65f87K41Sq6onxFlFGl/c2nOE1yrKtWyLqAB0/LNUTbpRq66JIlxj99lqlNOIdPHdSKsx+sa9HfZzA1jdG8ktq2oXOKwTcjt6wvANtJQ8jpRezj3pCVqU7mpQrnHuwfsNNNBLzUhuP8Cm0WFDyiXd2VwbagB9AYR5i0NztRbKCiztqpGt5W7+yMRdnJiLXjFLA276bb6ukqjxqKCOJY1o2TLY4S0XJMG6NNFTKhPa/fE1CxyMGnNp+cHr+pFtP0smvCgoga4pl6UiwwiKogxlSVnLreiFwkKS5pTgzhOS91AE+wTIFG6pYRAC5Q== juju-client-key
+          automatically-retry-hooks: true
+          backup-dir: ""
+          charmhub-url: https://api.charmhub.io
+          cloudinit-userdata: ""
+          container-image-metadata-defaults-disabled: false
+          container-image-metadata-url: ""
+          container-image-stream: released
+          container-inherit-properties: ""
+          container-networking-method: ""
+          default-base: ""
+          default-space: ""
+          development: false
+          disable-network-management: false
+          disable-telemetry: false
+          egress-subnets: ""
+          enable-os-refresh-update: true
+          enable-os-upgrade: true
+          fan-config: ""
+          firewall-mode: instance
+          ftp-proxy: ""
+          http-proxy: ""
+          https-proxy: ""
+          ignore-machine-addresses: false
+          image-metadata-defaults-disabled: false
+          image-metadata-url: ""
+          image-stream: released
+          juju-ftp-proxy: ""
+          juju-http-proxy: ""
+          juju-https-proxy: ""
+          juju-no-proxy: 127.0.0.1,localhost,::1
+          logforward-enabled: false
+          logging-config: <root>=INFO
+          logging-output: ""
+          lxd-snap-channel: 5.0/stable
+          max-action-results-age: 336h
+          max-action-results-size: 5G
+          max-status-history-age: 336h
+          max-status-history-size: 5G
+          mode: requires-prompts
+          name: controller
+          net-bond-reconfigure-delay: 17
+          no-proxy: 127.0.0.1,localhost,::1
+          num-container-provision-workers: 4
+          num-provision-workers: 16
+          operator-storage: microk8s-hostpath
+          provisioner-harvest-mode: destroyed
+          proxy-ssh: false
+          resource-tags: {}
+          saas-ingress-allow: 0.0.0.0/0,::/0
+          secret-backend: auto
+          snap-http-proxy: ""
+          snap-https-proxy: ""
+          snap-store-assertions: ""
+          snap-store-proxy: ""
+          snap-store-proxy-url: ""
+          ssh-allow: 0.0.0.0/0,::/0
+          ssl-hostname-verification: true
+          storage-default-block-source: kubernetes
+          storage-default-filesystem-source: kubernetes
+          test-mode: false
+          transmit-vendor-metrics: true
+          type: kubernetes
+          update-status-hook-interval: 5m
+          uuid: e8d9713e-5bde-4813-87bb-2d22205fbc6f
+          workload-storage: microk8s-hostpath
+        controller-model-version: 0
+        controller-config-defaults:
+          operator-storage: microk8s-hostpath
+          workload-storage: microk8s-hostpath
+        bootstrap-machine-constraints:
+          mem: 1536
+        model-constraints: {}
+        custom-image-metadata: "null"
+        controller-cloud: |
+          name: a
+          type: docker
+          endpoint: https://127.0.0.1:16448
+          regions:
+            default: {}
+        controller-cloud-region: default
+        controller-charm-channel:
+          track: "3.6"
+          risk: stable
+          branch: ""
+        BOOTSTRAPPARAMS
+
+        /opt/jujud bootstrap-state /var/lib/juju/bootstrap-params
+
+
+  db:
+    image: jujusolutions/juju-db:latest
