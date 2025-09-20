@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -11,12 +12,14 @@ import (
 	"github.com/juju/loggo"
 	"github.com/juju/names/v5"
 	"github.com/juju/version/v2"
+	"github.com/mitchellh/go-linereader"
 
 	"github.com/juju/juju/internal/provider/kubernetes/constants"
 
 	stdcontext "context"
 
 	dockercontainer "github.com/docker/docker/api/types/container"
+	dockerimage "github.com/docker/docker/api/types/image"
 	dockermount "github.com/docker/docker/api/types/mount"
 	dockernetwork "github.com/docker/docker/api/types/network"
 	dockerclient "github.com/docker/docker/client"
@@ -159,10 +162,11 @@ func (b *dockerBroker) Bootstrap(ctx environs.BootstrapContext, callCtx context.
 			panic(err)
 		}
 
+		// TODO: replace with copy from in memory.
 		// Now create files for controller
 		// shared-secret: MongoDB replica set authentication key
 		// Mount: MongoDB container -> /var/lib/juju/shared-secret
-		os.WriteFile("./shared-secret", []byte(si.SharedSecret), 0600)
+		os.WriteFile("./shared-secret", []byte(si.SharedSecret), 0400)
 
 		// server.pem: TLS certificate for MongoDB and controller
 		// Mount: MongoDB container -> /var/lib/juju/server.pem
@@ -171,15 +175,15 @@ func (b *dockerBroker) Bootstrap(ctx environs.BootstrapContext, callCtx context.
 
 		// bootstrap-params: State initialization parameters
 		// Mount: Controller container -> /var/lib/juju/bootstrap-params
-		os.WriteFile("bootstrap-params", bootstrapParamsContent, 0600)
+		os.WriteFile("bootstrap-params", bootstrapParamsContent, 0400)
 
 		// agent.conf: Controller agent configuration
 		// Mount: Controller container -> /var/lib/juju/agents/controller-0/template-agent.conf
-		os.WriteFile("agent.conf", agentConfigFileContent, 0600)
+		os.WriteFile("agent.conf", agentConfigFileContent, 0400)
 
 		// unit-agent.conf: Unit agent configuration template
 		// Mount: Controller container -> /var/lib/juju/template-agent.conf
-		os.WriteFile("unit-agent.conf", unitAgentConfigFileContent, 0600)
+		os.WriteFile("unit-agent.conf", unitAgentConfigFileContent, 0400)
 
 		// Environment for container:
 		// pcfg.AgentEnvironment - set these
@@ -215,7 +219,8 @@ func (b *dockerBroker) Bootstrap(ctx environs.BootstrapContext, callCtx context.
 			}
 		}
 
-		b.makesAMongoPlz(ctx.Context(), "juju")
+		b.makesAMongoPlz(ctx.Context(), "juju", []byte(si.SharedSecret), []byte(mongo.GenerateSSLKey(si.Cert, si.PrivateKey)))
+		// TODO: Wait for MongoDB to be ready
 
 		return nil
 	}
@@ -227,17 +232,31 @@ func (b *dockerBroker) Bootstrap(ctx environs.BootstrapContext, callCtx context.
 	}, nil
 }
 
-func (b *dockerBroker) makesAMongoPlz(ctx stdcontext.Context, networkName string) {
+func (b *dockerBroker) makesAControllerPlz(ctx stdcontext.Context) {
+
+}
+
+func (b *dockerBroker) makesAMongoPlz(ctx stdcontext.Context, networkName string, sharedSecret, serverPem []byte) {
+	progress, err := b.client.ImagePull(ctx, "jujusolutions/juju-db:4.4", dockerimage.PullOptions{})
+	if err != nil {
+		panic(err)
+	}
+	defer progress.Close()
+
+	lr := linereader.New(progress)
+	for line := range lr.Ch {
+		fmt.Println(line)
+	}
+
 	containerConfig := &dockercontainer.Config{
-		Image: "jujusolutions/juju-db:4.4",
+		Image:      "jujusolutions/juju-db:4.4",
+		Entrypoint: []string{},
 		Cmd: []string{
-			"mongod",
-			"--replSet", "juju",
-			"--port", "37017",
-			"--sslMode", "requireSSL",
-			"--sslPEMKeyFile", "/var/lib/juju/server.pem",
-			"--auth",
-			"--keyFile", "/var/lib/juju/shared-secret",
+			"/bin/sh", "-c",
+			"chmod 400 /var/lib/juju/shared-secret && " +
+				"chmod 600 /var/lib/juju/server.pem && " +
+				"mkdir -p /data/db && " +
+				"mongod --replSet juju --port 37017 --sslMode requireSSL --sslPEMKeyFile /var/lib/juju/server.pem --auth --keyFile /var/lib/juju/shared-secret",
 		},
 		ExposedPorts: nat.PortSet{
 			"37017/tcp": struct{}{},
@@ -248,12 +267,12 @@ func (b *dockerBroker) makesAMongoPlz(ctx stdcontext.Context, networkName string
 		Mounts: []dockermount.Mount{
 			{
 				Type:   dockermount.TypeBind,
-				Source: "./shared-secret",
+				Source: "/home/ubuntu/repos/juju/shared-secret",
 				Target: "/var/lib/juju/shared-secret",
 			},
 			{
 				Type:   dockermount.TypeBind,
-				Source: "./server.pem",
+				Source: "/home/ubuntu/repos/juju/server.pem",
 				Target: "/var/lib/juju/server.pem",
 			},
 		},
@@ -276,7 +295,6 @@ func (b *dockerBroker) makesAMongoPlz(ctx stdcontext.Context, networkName string
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 // Config returns the configuration data with which the Environ was created.
