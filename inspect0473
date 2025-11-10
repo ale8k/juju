@@ -1,0 +1,264 @@
+[
+    {
+        "Id": "04734318d38226b3b20c63e36511add52d6104e4a646d7fc89a570b6f295b107",
+        "Created": "2025-11-10T15:16:10.745034259Z",
+        "Path": "sh",
+        "Args": [
+            "-c",
+            "/bin/sh",
+            "-c",
+            "echo \"Starting Juju controller agent...\"\nsleep 10\nexport JUJU_DATA_DIR=/var/lib/juju\nexport JUJU_TOOLS_DIR=$JUJU_DATA_DIR/tools\n\nmkdir -p $JUJU_TOOLS_DIR\ncp /opt/jujud $JUJU_TOOLS_DIR/jujud\n\ntest -e $JUJU_DATA_DIR/agents/controller-0/agent.conf || $JUJU_TOOLS_DIR/jujud bootstrap-state --data-dir $JUJU_DATA_DIR --show-log --timeout 20m0s\n\nmkdir -p /var/lib/pebble/default/layers\ncat > /var/lib/pebble/default/layers/001-jujud.yaml <<EOF\nsummary: jujud service\nservices:\n    jujud:\n        summary: Juju controller agent\n        startup: enabled\n        override: replace\n        command: $JUJU_TOOLS_DIR/jujud machine --data-dir $JUJU_DATA_DIR --controller-id 0 --log-to-stderr --show-log\n\nEOF\n\nexec /opt/pebble run --http :38811 --verbose"
+        ],
+        "State": {
+            "Status": "restarting",
+            "Running": true,
+            "Paused": false,
+            "Restarting": true,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2025-11-10T15:16:37.992946256Z",
+            "FinishedAt": "2025-11-10T15:16:38.330369452Z"
+        },
+        "Image": "sha256:706780d09977e643dd7858322dc9cbca60fc52c75d3ba74a0ee8dce0d3ea89c9",
+        "ResolvConfPath": "/var/lib/docker/containers/04734318d38226b3b20c63e36511add52d6104e4a646d7fc89a570b6f295b107/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/04734318d38226b3b20c63e36511add52d6104e4a646d7fc89a570b6f295b107/hostname",
+        "HostsPath": "/var/lib/docker/containers/04734318d38226b3b20c63e36511add52d6104e4a646d7fc89a570b6f295b107/hosts",
+        "LogPath": "/var/lib/docker/containers/04734318d38226b3b20c63e36511add52d6104e4a646d7fc89a570b6f295b107/04734318d38226b3b20c63e36511add52d6104e4a646d7fc89a570b6f295b107-json.log",
+        "Name": "/juju-controller",
+        "RestartCount": 9,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "bridge",
+            "PortBindings": {
+                "17022/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "17022"
+                    }
+                ],
+                "17070/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "17070"
+                    }
+                ],
+                "38811/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "38811"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "always",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "volume",
+                    "Source": "juju-controller-6fded1c8-2dc4-4363-8db8-716db4c093fc",
+                    "Target": "/var/lib/juju"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware",
+                "/sys/devices/virtual/powercap"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "ID": "04734318d38226b3b20c63e36511add52d6104e4a646d7fc89a570b6f295b107",
+                "LowerDir": "/var/lib/docker/overlay2/2d282b782d1244bd62d2f1a4e91077aa1ea6178f0eb12cf461e87a3bede5e986-init/diff:/var/lib/docker/overlay2/7a7fd08a7936cc31b8fe1777120b16abb7e9ca1ef0005c63ebabf3e4b0c59482/diff:/var/lib/docker/overlay2/4e8738626a20cf6fbfc0765f441e304d5c6079c7942048f43117183dd0e6b9c1/diff:/var/lib/docker/overlay2/e0faa9ea752ff59c9d5c7b472c8e21863dc204ef93872eef7ea46716b19fd7bc/diff:/var/lib/docker/overlay2/d71701278a38b8d0485df79b9a5dcbef7c8f17f2fe7b9181826d70e608a23d23/diff",
+                "MergedDir": "/var/lib/docker/overlay2/2d282b782d1244bd62d2f1a4e91077aa1ea6178f0eb12cf461e87a3bede5e986/merged",
+                "UpperDir": "/var/lib/docker/overlay2/2d282b782d1244bd62d2f1a4e91077aa1ea6178f0eb12cf461e87a3bede5e986/diff",
+                "WorkDir": "/var/lib/docker/overlay2/2d282b782d1244bd62d2f1a4e91077aa1ea6178f0eb12cf461e87a3bede5e986/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "juju-controller-6fded1c8-2dc4-4363-8db8-716db4c093fc",
+                "Source": "/var/lib/docker/volumes/juju-controller-6fded1c8-2dc4-4363-8db8-716db4c093fc/_data",
+                "Destination": "/var/lib/juju",
+                "Driver": "local",
+                "Mode": "z",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "04734318d382",
+            "Domainname": "",
+            "User": "root",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "17022/tcp": {},
+                "17070/tcp": {},
+                "38811/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "JUJU_CONTROLLER_UUID=cfccb978-1151-40f6-8849-1220788d4fbd",
+                "JUJU_CONTAINER_NAME=api-server",
+                "JUJU_CONTAINER_NAMES=api-server",
+                "JUJU_MODEL_UUID=6fded1c8-2dc4-4363-8db8-716db4c093fc",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "echo \"Starting Juju controller agent...\"\nsleep 10\nexport JUJU_DATA_DIR=/var/lib/juju\nexport JUJU_TOOLS_DIR=$JUJU_DATA_DIR/tools\n\nmkdir -p $JUJU_TOOLS_DIR\ncp /opt/jujud $JUJU_TOOLS_DIR/jujud\n\ntest -e $JUJU_DATA_DIR/agents/controller-0/agent.conf || $JUJU_TOOLS_DIR/jujud bootstrap-state --data-dir $JUJU_DATA_DIR --show-log --timeout 20m0s\n\nmkdir -p /var/lib/pebble/default/layers\ncat > /var/lib/pebble/default/layers/001-jujud.yaml <<EOF\nsummary: jujud service\nservices:\n    jujud:\n        summary: Juju controller agent\n        startup: enabled\n        override: replace\n        command: $JUJU_TOOLS_DIR/jujud machine --data-dir $JUJU_DATA_DIR --controller-id 0 --log-to-stderr --show-log\n\nEOF\n\nexec /opt/pebble run --http :38811 --verbose"
+            ],
+            "Image": "ghcr.io/juju/jujud-operator:4.0-beta8",
+            "Volumes": null,
+            "WorkingDir": "/var/lib/juju",
+            "Entrypoint": [
+                "sh",
+                "-c"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "juju-controller": "cfccb978-1151-40f6-8849-1220788d4fbd",
+                "juju-model": "6fded1c8-2dc4-4363-8db8-716db4c093fc",
+                "juju.is-controller": "true",
+                "org.opencontainers.image.ref.name": "ubuntu",
+                "org.opencontainers.image.version": "24.04"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "juju-6fded1c8-2dc4-4363-8db8-716db4c093fc": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "",
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "f1f57374f5fd880baf7a3541efa1aa0e54df25810462fd419de635abeb41bd0e",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": [
+                        "juju-controller",
+                        "04734318d382"
+                    ]
+                }
+            }
+        }
+    }
+]

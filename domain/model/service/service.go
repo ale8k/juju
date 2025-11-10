@@ -184,7 +184,7 @@ type Service struct {
 }
 
 var (
-	caasCloudTypes = []string{cloud.CloudTypeKubernetes}
+	caasCloudTypes = []string{cloud.CloudTypeKubernetes, cloud.CloudTypeDocker}
 )
 
 // NewService returns a new Service for interacting with a models state.

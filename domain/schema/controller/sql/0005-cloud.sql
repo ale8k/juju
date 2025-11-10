@@ -23,7 +23,8 @@ INSERT INTO cloud_type VALUES
 (6, 'gce'),
 (7, 'oci'),
 (8, 'openstack'),
-(9, 'vsphere');
+(9, 'vsphere'),
+(10, 'docker');
 
 CREATE TABLE auth_type (
     id INT PRIMARY KEY,

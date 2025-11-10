@@ -176,7 +176,7 @@ func (c *BootstrapCommand) Run(ctx *cmd.Context) error {
 		}
 	}
 
-	isCAAS := args.ControllerCloud.Type == cloud.CloudTypeKubernetes
+	isCAAS := args.ControllerCloud.Type == cloud.CloudTypeKubernetes || args.ControllerCloud.Type == cloud.CloudTypeDocker
 
 	if isCAAS {
 		if err := c.ensureConfigFilesForCaas(); err != nil {

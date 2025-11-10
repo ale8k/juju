@@ -1,0 +1,162 @@
+Name:               controller
+Namespace:          controller-40
+CreationTimestamp:  Mon, 10 Nov 2025 09:53:30 +0000
+Selector:           app.kubernetes.io/name=controller
+Labels:             app.kubernetes.io/managed-by=juju
+                    app.kubernetes.io/name=controller
+                    model.juju.is/disable-webhook=true
+Annotations:        controller.juju.is/id: 1165bdc0-b9d0-477e-8eac-ea9f3f77e850
+Replicas:           1 desired | 1 total
+Update Strategy:    RollingUpdate
+  Partition:        0
+Pods Status:        1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app.kubernetes.io/name=controller
+                    model.juju.is/disable-webhook=true
+  Annotations:      controller.juju.is/id: 1165bdc0-b9d0-477e-8eac-ea9f3f77e850
+  Service Account:  controller
+  Init Containers:
+   charm-init:
+    Image:      ghcr.io/juju/jujud-operator:4.0-rc1
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      /opt/containeragent
+    Args:
+      init
+      --containeragent-pebble-dir
+      /containeragent/pebble
+      --charm-modified-version
+      0
+      --data-dir
+      /var/lib/juju
+      --bin-dir
+      /charm/bin
+      --profile-dir
+      /containeragent/etc/profile.d
+      --pebble-identities-file
+      /charm/etc/pebble/identities.yaml
+      --pebble-charm-identity
+      170
+      --controller
+    Environment Variables from:
+      controller-application-config  Secret  Optional: false
+    Environment:
+      JUJU_CONTAINER_NAMES:  api-server
+      JUJU_K8S_POD_NAME:      (v1:metadata.name)
+      JUJU_K8S_POD_UUID:      (v1:metadata.uid)
+    Mounts:
+      /charm/bin from charm-data (rw,path="charm/bin")
+      /charm/containers from charm-data (rw,path="charm/containers")
+      /charm/etc/pebble/ from charm-data (rw,path="charm/etc/pebble/")
+      /containeragent/etc/profile.d from charm-data (rw,path="containeragent/etc/profile.d")
+      /containeragent/pebble from charm-data (rw,path="containeragent/pebble")
+      /var/lib/juju from charm-data (rw,path="var/lib/juju")
+      /var/lib/juju/template-agent.conf from controller-agent-conf (rw,path="controller-unit-agent.conf")
+  Containers:
+   charm:
+    Image:      ghcr.io/juju/charm-base:ubuntu-24.04
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      /charm/bin/pebble
+    Args:
+      run
+      --http
+      :38812
+      --verbose
+    Limits:
+      memory:  1536Mi
+    Requests:
+      memory:  64Mi
+    Environment:
+      JUJU_CONTAINER_NAMES:  api-server
+    Mounts:
+      /charm/bin from charm-data (ro,path="charm/bin")
+      /charm/containers from charm-data (rw,path="charm/containers")
+      /etc/profile.d/juju-introspection.sh from charm-data (ro,path="containeragent/etc/profile.d/juju-introspection.sh")
+      /usr/bin/juju-exec from charm-data (ro,path="charm/bin/containeragent")
+      /usr/bin/juju-introspect from charm-data (ro,path="charm/bin/containeragent")
+      /var/lib/juju from storage (rw)
+      /var/lib/juju/template-agent.conf from controller-agent-conf (rw,path="controller-unit-agent.conf")
+      /var/lib/pebble/default from charm-data (rw,path="containeragent/pebble")
+      /var/log/juju from charm-data (rw,path="containeragent/var/log/juju")
+   api-server:
+    Image:      ghcr.io/juju/jujud-operator:4.0-rc1
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      /bin/sh
+    Args:
+      -c
+      export JUJU_DATA_DIR=/var/lib/juju
+      export JUJU_TOOLS_DIR=$JUJU_DATA_DIR/tools
+      
+      mkdir -p $JUJU_TOOLS_DIR
+      cp /opt/jujud $JUJU_TOOLS_DIR/jujud
+      
+      test -e $JUJU_DATA_DIR/agents/controller-0/agent.conf || $JUJU_TOOLS_DIR/jujud bootstrap-state --data-dir $JUJU_DATA_DIR --show-log --timeout 20m0s
+      
+      mkdir -p /var/lib/pebble/default/layers
+      cat > /var/lib/pebble/default/layers/001-jujud.yaml <<EOF
+      summary: jujud service
+      services:
+          jujud:
+              summary: Juju controller agent
+              startup: enabled
+              override: replace
+              command: $JUJU_TOOLS_DIR/jujud machine --data-dir $JUJU_DATA_DIR --controller-id 0 --log-to-stderr --show-log
+      
+      EOF
+      
+      exec /opt/pebble run --http :38811 --verbose
+      
+    Liveness:   http-get http://:38811/v1/health%3Flevel=alive delay=1s timeout=3s period=5s #success=1 #failure=2
+    Readiness:  http-get http://:38811/v1/health%3Flevel=ready delay=1s timeout=3s period=5s #success=1 #failure=2
+    Startup:    http-get http://:38811/v1/health%3Flevel=alive delay=3s timeout=3s period=3s #success=1 #failure=200
+    Environment Variables from:
+      controller-application-config  Secret  Optional: false
+    Environment:
+      JUJU_CONTAINER_NAME:  api-server
+      PEBBLE_SOCKET:        /charm/container/pebble.socket
+    Mounts:
+      /charm/container from charm-data (rw,path="charm/containers/api-server")
+      /etc/profile.d/juju-introspection.sh from charm-data (ro,path="containeragent/etc/profile.d/juju-introspection.sh")
+      /tmp from apiserver-scratch (rw,path="tmp")
+      /usr/bin/juju-dumplogs from charm-data (ro,path="charm/bin/containeragent")
+      /usr/bin/juju-exec from charm-data (ro,path="charm/bin/containeragent")
+      /usr/bin/juju-introspect from charm-data (ro,path="charm/bin/containeragent")
+      /var/lib/juju from storage (rw)
+      /var/lib/juju/agents/controller-0 from storage (rw,path="agents/controller-0")
+      /var/lib/juju/agents/controller-0/template-agent.conf from controller-agent-conf (ro,path="controller-agent.conf")
+      /var/lib/juju/bootstrap-params from controller-bootstrap-params (ro,path="bootstrap-params")
+      /var/lib/pebble from apiserver-scratch (rw,path="var/lib/pebble")
+      /var/log/juju from apiserver-scratch (rw,path="var/log/juju")
+  Volumes:
+   charm-data:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+   apiserver-scratch:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+   controller-agent-conf:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      controller-configmap
+    Optional:  false
+   controller-bootstrap-params:
+    Type:          ConfigMap (a volume populated by a ConfigMap)
+    Name:          controller-configmap
+    Optional:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Volume Claims:
+  Name:          storage
+  StorageClass:  microk8s-hostpath
+  Labels:        app.kubernetes.io/managed-by=juju
+                 app.kubernetes.io/name=controller
+  Annotations:   controller.juju.is/id=1165bdc0-b9d0-477e-8eac-ea9f3f77e850
+  Capacity:      20Gi
+  Access Modes:  [ReadWriteOnce]
+Events:          <none>
